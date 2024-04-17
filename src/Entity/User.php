@@ -223,7 +223,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->pdf->contains($pdf)) {
             $this->pdf->add($pdf);
-            $pdf->setCustomer($this);
+            $pdf->setUser($this);
         }
 
         return $this;
@@ -233,8 +233,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->pdf->removeElement($pdf)) {
             // set the owning side to null (unless already changed)
-            if ($pdf->getCustomer() === $this) {
-                $pdf->setCustomer(null);
+            if ($pdf->getUser() === $this) {
+                $pdf->setUser(null);
             }
         }
 
