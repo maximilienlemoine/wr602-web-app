@@ -5,14 +5,26 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Form\PdfType;
+use App\HttpClient\PdfServiceHttpClient;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 #[Route('/pdf')]
 class PdfController extends AbstractController
 {
+    private PdfServiceHttpClient $pdfServiceHttpClient;
+
+    public function __construct(PdfServiceHttpClient $pdfServiceHttpClient)
+    {
+        $this->pdfServiceHttpClient = $pdfServiceHttpClient;
+    }
 
     #[Route('/', name: 'pdf_index')]
     public function index(): Response
@@ -22,6 +34,12 @@ class PdfController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
     #[Route('/create', name: 'pdf_create')]
     public function create(Request $request): Response
     {
@@ -30,10 +48,39 @@ class PdfController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $pdf = $form->getData();
+            $file = $form->get('file')->getData();
 
-            $this->addFlash('success', 'Le PDF a bien été créé.');
+            if ($pdf['url']) {
+                $response = $this->pdfServiceHttpClient->post(
+                    'pdf/generate/url',
+                    [
+                        'body' => [
+                            'url' => $pdf['url'],
+                        ],
+                    ]
+                );
+            } elseif ($file) {
+                $multipartStream = new MultipartStream;
+                $body = new FormDataPart([
+                    'html' => fopen($file->getPathname(), 'r'),
+                ]);
+                $response = $this->pdfServiceHttpClient->post(
+                    'pdf/generate/html',
+                    [
+                        'headers' => [
+                            'Content-Type' => 'multipart/form-data',
+                        ],
+                        'body' => $body->bodyToIterable(),
+                    ]
+                );
+            } else {
+                throw new \Exception('Invalid form data');
+            }
 
-            return $this->redirectToRoute('pdf_index');
+            return new Response($response, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => sprintf('inline; filename="%s"', $pdf['title'].'.pdf'),
+            ]);
         }
 
         return $this->render('pdf/create.html.twig', [
