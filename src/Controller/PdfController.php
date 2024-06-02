@@ -8,7 +8,6 @@ use App\Form\PdfFileType;
 use App\Form\PdfHtmlType;
 use App\Form\PdfUrlType;
 use App\HttpClient\PdfServiceHttpClient;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
