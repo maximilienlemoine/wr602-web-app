@@ -1,0 +1,29 @@
+{{ form_start(form, {'attr': {'id': 'pdf_html'}}) }}
+    {{ form_row(form.title) }}
+    <div style="color: red; display: none" id="prevent_error_title">
+        Veuillez saisir le titre de votre PDF
+    </div>
+
+    {{ form_row(form.html) }}
+    <button type="button" id="pdf_submit_form">Générer</button>
+{{ form_end(form) }}
+<script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+<script>
+    ClassicEditor
+        .create( document.querySelector( '#pdf_html_html' ), {
+            toolbar: [ 'undo', 'redo' , '|','heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList'],
+        })
+        .catch( error => {
+            console.error( error );
+        } );
+
+    document.getElementById('pdf_submit_form').addEventListener('click', function() {
+        document.getElementById('pdf_html_html').value = document.querySelector('.ck-editor__editable').innerHTML;
+
+        if (document.getElementById('pdf_html').checkValidity())
+            document.getElementById('pdf_html').submit();
+
+        if (document.getElementById('pdf_html_title').value === '')
+            document.getElementById('prevent_error_title').style.display = 'block';
+    });
+</script>
