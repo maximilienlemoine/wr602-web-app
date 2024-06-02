@@ -31,5 +31,4 @@ class PdfServiceHttpClient
 
         return $response->getContent();
     }
-
 }
