@@ -10,8 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
-class PdfType extends AbstractType
+class PdfFileType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -19,20 +20,22 @@ class PdfType extends AbstractType
             ->add('title', TextType::class, [
                 'label' => 'Titre',
             ])
-            ->add('url', TextType::class, [
-                'label' => 'URL',
-                'required' => false,
-            ])
             ->add('file', FileType::class, [
                 'label' => 'Fichier',
                 'mapped' => false,
-                'required' => false,
+                'required' => true,
                 'attr' => ['accept' => '.html'],
-            ])
-            ->add('html', TextType::class, [
-                'label' => 'HTML',
-                'required' => false,
-            ])
+                'constraints' => [
+                    new File([
+                        'maxSize' => '1024k',
+                        'mimeTypes' => [
+                            'text/html',
+                            'text/plain',
+                        ],
+                        'mimeTypesMessage' => 'Veuillez uploader un fichier HTML valide',
+                    ])
+                ],
+        ])
         ;
     }
 

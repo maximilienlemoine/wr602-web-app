@@ -5,7 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     pdf_generator_url: '%env(PDF_GENERATOR_URL)%'
-
+    public_temp_relative_directory: 'temp'
+    public_temp_absolute_directory: '%kernel.project_dir%/%public_temp_relative_directory%'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -27,3 +28,7 @@ services:
     App\HttpClient\PdfServiceHttpClient:
         arguments:
             $pdfGeneratorUrl: '%pdf_generator_url%'
+
+    App\Controller\PdfController:
+        arguments:
+            $publicTempAbsoluteDirectory: '%public_temp_absolute_directory%'
