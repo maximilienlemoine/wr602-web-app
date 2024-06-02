@@ -58,15 +58,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Pdf>
      */
-    #[ORM\OneToMany(targetEntity: Pdf::class, mappedBy: 'customer', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Pdf::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $pdf;
 
     #[ORM\Column(type: 'boolean')]
-    private $isVerified = false;
+    private bool $isVerified = false;
 
     public function __construct()
     {
         $this->pdf = new ArrayCollection();
+        $this->setCreatedAt(new \DateTimeImmutable());
     }
 
     public function getId(): ?int
