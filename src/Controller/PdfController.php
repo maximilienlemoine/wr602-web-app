@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Controller;
 
 use App\Form\PdfFileType;
@@ -86,7 +84,8 @@ class PdfController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $pdfData = $form->getData();;
+            $pdfData = $form->getData();
+            ;
 
             $filename = uniqid('pdf_', true) . '.html';
             $filePath = $this->publicTempAbsoluteDirectory . '/' . $filename;
