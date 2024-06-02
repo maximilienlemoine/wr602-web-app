@@ -41,7 +41,6 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // encode the plain password
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
                     $user,
@@ -52,12 +51,19 @@ class RegistrationController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            $this->emailVerifier->sendEmailConfirmation('verify_email', $user,
-                (new TemplatedEmail())
-                    ->from(new Address('no-reply@maximilien-lemoine.fr', 'Ne pas répondre  - Générateur PDF'))
-                    ->to($user->getEmail())
-                    ->subject('Générateur PDF - Vérification de votre adresse email')
-                    ->htmlTemplate('registration/confirmation_email.html.twig')
+            $this->emailVerifier->sendEmailConfirmation(
+                'verify_email',
+                $user,
+                (
+                    (new TemplatedEmail())
+                        ->from(new Address(
+                            'no-reply@maximilien-lemoine.fr',
+                            'Ne pas répondre  - Générateur PDF'
+                        ))
+                        ->to($user->getEmail())
+                        ->subject('Générateur PDF - Vérification de votre adresse email')
+                        ->htmlTemplate('registration/confirmation_email.html.twig')
+                )
             );
 
             return $security->login($user, 'form_login', 'main');
