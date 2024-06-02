@@ -87,16 +87,21 @@ class PdfController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $pdfData = $form->getData();
+            $pdfData = $form->getData();;
+
+            $filename = uniqid('pdf_', true) . '.html';
+            $filePath = $this->publicTempAbsoluteDirectory . '/' . $filename;
+            file_put_contents($filePath, $pdfData['html']);
 
             $response = $this->pdfServiceHttpClient->post(
-                'pdf/generate/html',
+                'pdf/generate/file',
                 [
                     'body' => [
-                        'html' => $pdfData['html'],
+                        'file' => fopen($filePath, 'r'),
                     ],
                 ]
             );
+            unlink($filePath); // Supprimer le fichier après utilisation
 
             return new Response($response, 200, [
                 'Content-Type' => 'application/pdf',
@@ -104,7 +109,7 @@ class PdfController extends AbstractController
             ]);
         }
 
-        return $this->render('pdf/create.html.twig', [
+        return $this->render('pdf/create_html.html.twig', [
             'form' => $form->createView(),
         ]);
     }
