@@ -17,11 +17,19 @@ class PdfHtmlType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'label' => 'Titre',
+                'label' => 'Titre *',
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Titre du fichier',
+                    'class' => 'form-control'
+                ]
             ])
             ->add('html', TextType::class, [
-                'label' => 'HTML',
+                'label' => 'HTML *',
                 'required' => false,
+                'attr' => [
+                    'class' => 'form-control'
+                ]
             ])
         ;
     }

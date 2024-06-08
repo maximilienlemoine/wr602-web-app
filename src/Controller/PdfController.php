@@ -6,6 +6,9 @@ use App\Form\PdfFileType;
 use App\Form\PdfHtmlType;
 use App\Form\PdfUrlType;
 use App\HttpClient\PdfServiceHttpClient;
+use App\Service\Pdf\PdfLimiter;
+use App\Service\Pdf\PdfRegister;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -14,17 +17,23 @@ use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
-#[Route('/pdf')]
+#[Route('/membre/pdf')]
 class PdfController extends AbstractController
 {
     private PdfServiceHttpClient $pdfServiceHttpClient;
+    private PdfRegister $pdfRegister;
+    private PdfLimiter $pdfLimiter;
     private string $publicTempAbsoluteDirectory;
 
     public function __construct(
         PdfServiceHttpClient $pdfServiceHttpClient,
+        PdfRegister $pdfRegister,
+        PdfLimiter $pdfLimiter,
         string $publicTempAbsoluteDirectory
     ) {
         $this->pdfServiceHttpClient = $pdfServiceHttpClient;
+        $this->pdfRegister = $pdfRegister;
+        $this->pdfLimiter = $pdfLimiter;
         $this->publicTempAbsoluteDirectory = $publicTempAbsoluteDirectory;
     }
 
@@ -49,6 +58,11 @@ class PdfController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->pdfLimiter->hasReachedLimit($this->getUser())) {
+                $this->addFlash('error', 'Vous avez atteint la limite de génération de PDF');
+                return $this->redirectToRoute('pdf_index');
+            }
+
             $pdfData = $form->getData();
 
             $response = $this->pdfServiceHttpClient->post(
@@ -59,6 +73,8 @@ class PdfController extends AbstractController
                     ],
                 ]
             );
+
+            $this->pdfRegister->registerPdf($this->getUser(), $pdfData);
 
             return new Response($response, 200, [
                 'Content-Type' => 'application/pdf',
@@ -84,8 +100,12 @@ class PdfController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->pdfLimiter->hasReachedLimit($this->getUser())) {
+                $this->addFlash('error', 'Vous avez atteint la limite de génération de PDF');
+                return $this->redirectToRoute('pdf_index');
+            }
+
             $pdfData = $form->getData();
-            ;
 
             $filename = uniqid('pdf_', true) . '.html';
             $filePath = $this->publicTempAbsoluteDirectory . '/' . $filename;
@@ -100,6 +120,8 @@ class PdfController extends AbstractController
                 ]
             );
             unlink($filePath); // Supprimer le fichier après utilisation
+
+            $this->pdfRegister->registerPdf($this->getUser(), $pdfData);
 
             return new Response($response, 200, [
                 'Content-Type' => 'application/pdf',
@@ -125,6 +147,11 @@ class PdfController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($this->pdfLimiter->hasReachedLimit($this->getUser())) {
+                $this->addFlash('error', 'Vous avez atteint la limite de génération de PDF');
+                return $this->redirectToRoute('pdf_index');
+            }
+
             $pdfData = $form->getData();
             $file = $form->get('file')->getData();
 
@@ -145,6 +172,8 @@ class PdfController extends AbstractController
                 ]
             );
             unlink($filePath); // Supprimer le fichier après utilisation
+
+            $this->pdfRegister->registerPdf($this->getUser(), $pdfData);
 
             return new Response($response, 200, [
                 'Content-Type' => 'application/pdf',
