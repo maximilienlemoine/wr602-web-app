@@ -24,5 +24,4 @@ class PdfLimiter
 
         return false;
     }
-
 }

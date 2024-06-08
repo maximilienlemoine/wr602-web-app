@@ -4,6 +4,7 @@ namespace App\Service\Pdf;
 
 use App\Entity\Pdf;
 use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
 class PdfRegister
@@ -20,7 +21,7 @@ class PdfRegister
         $registration = (new Pdf())
             ->setUser($user)
             ->setTitle($pdfData['title'])
-            ->setCreatedAt(new \DateTimeImmutable());
+            ->setCreatedAt(new DateTimeImmutable());
 
         $this->entityManager->persist($registration);
         $this->entityManager->flush();

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Pdf;
 use App\Entity\User;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -27,7 +28,7 @@ class PdfRepository extends ServiceEntityRepository
      */
     public function findCountTodayPdfByUser(User $user): int
     {
-        $today = new \DateTimeImmutable();
+        $today = new DateTimeImmutable();
         $startOfDay = $today->setTime(0, 0);
         $endOfDay = $today->setTime(23, 59);
 
