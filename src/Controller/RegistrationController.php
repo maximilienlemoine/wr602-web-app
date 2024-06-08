@@ -59,7 +59,7 @@ class RegistrationController extends AbstractController
                 (
                     (new TemplatedEmail())
                         ->from(new Address(
-                            'no-reply@maximilien-lemoine.fr',
+                            $this->getParameter('mail_from'),
                             'Ne pas répondre  - Générateur PDF'
                         ))
                         ->to($user->getEmail())
