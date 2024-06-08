@@ -7,6 +7,7 @@ parameters:
     pdf_generator_url: '%env(PDF_GENERATOR_URL)%'
     public_temp_relative_directory: 'temp'
     public_temp_absolute_directory: '%kernel.project_dir%/%public_temp_relative_directory%'
+    mail_from: '%env(MAIL_FROM)%'
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -32,3 +33,7 @@ services:
     App\Controller\PdfController:
         arguments:
             $publicTempAbsoluteDirectory: '%public_temp_absolute_directory%'
+
+    App\Service\Mail\MailSender:
+        arguments:
+            $mailFrom: '%mail_from%'
