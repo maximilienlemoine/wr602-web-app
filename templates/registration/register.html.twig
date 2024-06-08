@@ -1,22 +1,42 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Inscription{% endblock %}
 
 {% block body %}
     {% for flash_error in app.flashes('verify_email_error') %}
         <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
     {% endfor %}
 
-    <h1>Register</h1>
+    <h1>Inscription</h1>
 
     {{ form_errors(registrationForm) }}
 
     {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword) }}
-        {{ form_row(registrationForm.firstName) }}
-        {{ form_row(registrationForm.lastName) }}
+    <div class="mb-3">
+        {{ form_label(registrationForm.email, 'Email *', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
+    </div>
 
-        <button type="submit" class="btn">Register</button>
+    <div class="mb-3">
+        {{ form_label(registrationForm.plainPassword.first, 'Mot de passe *', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(registrationForm.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(registrationForm.plainPassword.second, 'Confirmer le mot de passe *', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(registrationForm.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(registrationForm.firstName, 'Prénom *', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(registrationForm.firstName, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(registrationForm.lastName, 'Nom *', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(registrationForm.lastName, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+        <button type="submit" class="btn btn-primary">S'inscrire</button>
     {{ form_end(registrationForm) }}
 {% endblock %}

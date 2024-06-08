@@ -18,13 +18,21 @@ class PdfFileType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'label' => 'Titre',
+                'label' => 'Titre *',
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Titre du fichier',
+                    'class' => 'form-control'
+                ]
             ])
             ->add('file', FileType::class, [
-                'label' => 'Fichier',
+                'label' => 'Fichier *',
                 'mapped' => false,
                 'required' => true,
-                'attr' => ['accept' => '.html'],
+                'attr' => [
+                    'accept' => '.html',
+                    'class' => 'form-control'
+                ],
                 'constraints' => [
                     new File([
                         'maxSize' => '1024k',

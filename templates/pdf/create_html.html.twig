@@ -1,3 +1,7 @@
+{% extends 'base.html.twig' %}
+{% block title %}Génération de PDF{% endblock %}
+
+{% block body %}
 {{ form_start(form, {'attr': {'id': 'pdf_html'}}) }}
     {{ form_row(form.title) }}
     <div style="color: red; display: none" id="prevent_error_title">
@@ -5,7 +9,7 @@
     </div>
 
     {{ form_row(form.html) }}
-    <button type="button" id="pdf_submit_form">Générer</button>
+    <button class="btn btn-primary" type="button" id="pdf_submit_form">Générer</button>
 {{ form_end(form) }}
 <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
 <script>
@@ -27,3 +31,4 @@
             document.getElementById('prevent_error_title').style.display = 'block';
     });
 </script>
+{% endblock %}

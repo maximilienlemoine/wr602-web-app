@@ -5,9 +5,14 @@
         <div class="row">
             <div class="col-md-12">
                 <h1>PDF</h1>
-                <a href="{{ path('pdf_create_url') }}">Ajouter un pdf depuis un lien</a> <br>
-                <a href="{{ path('pdf_create_file') }}">Ajouter un pdf depuis un fichier html</a> <br>
-                <a href="{{ path('pdf_create_html') }}">Ajouter un pdf depuis du html</a> <br>
+                <p>
+                    Generer un pdf depuis un lien, un fichier html ou du html.
+                </p>
+                <div class="m-2 d-flex justify-content-evenly">
+                    <a class="btn btn-primary" href="{{ path('pdf_create_url') }}">Ajouter un pdf depuis un lien</a> <br>
+                    <a class="btn btn-primary" href="{{ path('pdf_create_file') }}">Ajouter un pdf depuis un fichier html</a> <br>
+                    <a class="btn btn-primary" href="{{ path('pdf_create_html') }}">Ajouter un pdf depuis du html</a> <br>
+                </div>
             </div>
         </div>
     </div>
