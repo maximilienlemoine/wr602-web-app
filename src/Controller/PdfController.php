@@ -6,6 +6,7 @@ use App\Form\PdfFileType;
 use App\Form\PdfHtmlType;
 use App\Form\PdfUrlType;
 use App\HttpClient\PdfServiceHttpClient;
+use App\Service\Mail\MailSender;
 use App\Service\Pdf\PdfLimiter;
 use App\Service\Pdf\PdfRegister;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,17 +24,20 @@ class PdfController extends AbstractController
     private PdfServiceHttpClient $pdfServiceHttpClient;
     private PdfRegister $pdfRegister;
     private PdfLimiter $pdfLimiter;
+    private MailSender $mailSender;
     private string $publicTempAbsoluteDirectory;
 
     public function __construct(
         PdfServiceHttpClient $pdfServiceHttpClient,
         PdfRegister $pdfRegister,
         PdfLimiter $pdfLimiter,
+        MailSender $mailSender,
         string $publicTempAbsoluteDirectory
     ) {
         $this->pdfServiceHttpClient = $pdfServiceHttpClient;
         $this->pdfRegister = $pdfRegister;
         $this->pdfLimiter = $pdfLimiter;
+        $this->mailSender = $mailSender;
         $this->publicTempAbsoluteDirectory = $publicTempAbsoluteDirectory;
     }
 
@@ -50,6 +54,7 @@ class PdfController extends AbstractController
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
     #[Route('/url/create', name: 'pdf_create_url')]
     public function create(Request $request): Response
@@ -75,6 +80,13 @@ class PdfController extends AbstractController
             );
 
             $this->pdfRegister->registerPdf($this->getUser(), $pdfData);
+            $this->mailSender->sendMail(
+                $this->getUser()->getEmail(),
+                'Génération de PDF',
+                'Votre PDF a bien été généré',
+                $response,
+                $pdfData['title']
+            );
 
             return new Response($response, 200, [
                 'Content-Type' => 'application/pdf',
@@ -92,6 +104,7 @@ class PdfController extends AbstractController
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
     #[Route('/html/create', name: 'pdf_create_html')]
     public function createHtml(Request $request): Response
@@ -111,22 +124,7 @@ class PdfController extends AbstractController
             $filePath = $this->publicTempAbsoluteDirectory . '/' . $filename;
             file_put_contents($filePath, $pdfData['html']);
 
-            $response = $this->pdfServiceHttpClient->post(
-                'pdf/generate/file',
-                [
-                    'body' => [
-                        'file' => fopen($filePath, 'r'),
-                    ],
-                ]
-            );
-            unlink($filePath); // Supprimer le fichier après utilisation
-
-            $this->pdfRegister->registerPdf($this->getUser(), $pdfData);
-
-            return new Response($response, 200, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => sprintf('inline; filename="%s"', $pdfData['title'] . '.pdf'),
-            ]);
+            return $this->generatePdf($filePath, $pdfData);
         }
 
         return $this->render('pdf/create_html.html.twig', [
@@ -139,6 +137,7 @@ class PdfController extends AbstractController
      * @throws ServerExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ClientExceptionInterface
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
     #[Route('/file/create', name: 'pdf_create_file')]
     public function createFile(Request $request): Response
@@ -163,26 +162,48 @@ class PdfController extends AbstractController
             $filePath = $this->publicTempAbsoluteDirectory.'/'.$file->getClientOriginalName();
 
             chmod($filePath, 0777);
-            $response = $this->pdfServiceHttpClient->post(
-                'pdf/generate/file',
-                [
-                    'body' => [
-                        'file' => fopen($filePath, 'r'),
-                    ],
-                ]
-            );
-            unlink($filePath); // Supprimer le fichier après utilisation
-
-            $this->pdfRegister->registerPdf($this->getUser(), $pdfData);
-
-            return new Response($response, 200, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => sprintf('inline; filename="%s"', $pdfData['title'] . '.pdf'),
-            ]);
+            return $this->generatePdf($filePath, $pdfData);
         }
 
         return $this->render('pdf/create.html.twig', [
             'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @param string $filePath
+     * @param mixed $pdfData
+     * @return Response
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     */
+    public function generatePdf(string $filePath, mixed $pdfData): Response
+    {
+        $response = $this->pdfServiceHttpClient->post(
+            'pdf/generate/file',
+            [
+                'body' => [
+                    'file' => fopen($filePath, 'r'),
+                ],
+            ]
+        );
+        unlink($filePath); // Supprimer le fichier après utilisation
+
+        $this->pdfRegister->registerPdf($this->getUser(), $pdfData);
+        $this->mailSender->sendMail(
+            $this->getUser()->getEmail(),
+            'Génération de PDF',
+            'Votre PDF a bien été généré',
+            $response,
+            $pdfData['title']
+        );
+
+        return new Response($response, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => sprintf('inline; filename="%s"', $pdfData['title'] . '.pdf'),
         ]);
     }
 }
