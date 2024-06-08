@@ -18,11 +18,21 @@ class PdfUrlType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'label' => 'Titre',
+                'label' => 'Titre *',
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Titre du fichier',
+                    'class' => 'form-control'
+                ]
+
             ])
             ->add('url', UrlType::class, [
-                'label' => 'URL',
+                'label' => 'URL *',
                 'required' => true,
+                'attr' => [
+                    'placeholder' => 'URL du fichier',
+                    'class' => 'form-control'
+                ]
             ])
         ;
     }

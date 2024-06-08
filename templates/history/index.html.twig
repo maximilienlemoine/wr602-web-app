@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique{% endblock %}
+
+{% block body %}
+<h1>Historique</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Titre du document</th>
+                <th>Date de création</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pdf in pdfs %}
+                <tr>
+                    <td>{{ pdf.title }}</td>
+                    <td>{{ pdf.createdAt|date('d/m/Y H:i:s') }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

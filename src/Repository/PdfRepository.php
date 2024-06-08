@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Pdf;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -21,28 +22,32 @@ class PdfRepository extends ServiceEntityRepository
         parent::__construct($registry, Pdf::class);
     }
 
-    //    /**
-    //     * @return Pdf[] Returns an array of Pdf objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Récupère les PDFs d'un utilisateur dans la journée
+     */
+    public function findCountTodayPdfByUser(User $user): int
+    {
+        $today = new \DateTimeImmutable();
+        $startOfDay = $today->setTime(0, 0);
+        $endOfDay = $today->setTime(23, 59);
 
-    //    public function findOneBySomeField($value): ?Pdf
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $this->createQueryBuilder('pdf')
+            ->select('COUNT(pdf)')
+            ->where('pdf.user = :user')
+            ->andWhere('pdf.createdAt BETWEEN :startOfDay AND :endOfDay')
+            ->setParameter('user', $user)
+            ->setParameter('startOfDay', $startOfDay)
+            ->setParameter('endOfDay', $endOfDay)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findByUser(User $user): array
+    {
+        return $this->createQueryBuilder('pdf')
+            ->where('pdf.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+    }
 }

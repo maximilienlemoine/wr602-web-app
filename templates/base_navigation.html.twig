@@ -1,0 +1,34 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ path('home') }}">{{ ux_icon('bi:file-pdf', {class: 'icon'}) }}</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                {% if app.user %}
+                    <li>
+                        <a class="nav-link" href="{{ path('pdf_index') }}">Générer un PDF</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('history') }}">Historique</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('subscription_management') }}">Mon abonnement</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('logout') }}">Déconnexion</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('login') }}">Connexion</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('register') }}">Inscription</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+
+<div class="example-wrapper">
+    <h1>Accueil</h1>
+    <p>Bienvenue sur le générateur de PDF.</p>
+    {% if app.user %}
+        <p>Vous êtes connecté en tant que {{ app.user }}.</p>
+        <a class="btn btn-primary" href="{{ path('logout') }}">Déconnexion</a>
+    {% else %}
+        <p>Connectez vous pour accéder à l'application.</p>
+        <a class="btn btn-primary" href="{{ path('login') }}">Connexion</a>
+    {% endif %}
+</div>
+{% endblock %}
