@@ -4,14 +4,20 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
+                {% if pdfCount >= app.user.subscription.pdfLimit %}
+                    <div class="alert alert-danger" role="alert">
+                        Vous avez atteint la limite de pdfs pour aujourd'hui.
+                    </div>
+                {% endif %}
                 <h1>PDF</h1>
                 <p>
                     Generer un pdf depuis un lien, un fichier html ou du html.
                 </p>
+
                 <div class="m-2 d-flex justify-content-evenly">
-                    <a class="btn btn-primary" href="{{ path('pdf_create_url') }}">Ajouter un pdf depuis un lien</a> <br>
-                    <a class="btn btn-primary" href="{{ path('pdf_create_file') }}">Ajouter un pdf depuis un fichier html</a> <br>
-                    <a class="btn btn-primary" href="{{ path('pdf_create_html') }}">Ajouter un pdf depuis du html</a> <br>
+                    <a class="btn btn-primary {% if pdfCount >= app.user.subscription.pdfLimit %}disabled{% endif %}" href="{{ path('pdf_create_url') }}">Ajouter un pdf depuis un lien</a> <br>
+                    <a class="btn btn-primary {% if pdfCount >= app.user.subscription.pdfLimit %}disabled{% endif %}" href="{{ path('pdf_create_file') }}">Ajouter un pdf depuis un fichier html</a> <br>
+                    <a class="btn btn-primary {% if pdfCount >= app.user.subscription.pdfLimit %}disabled{% endif %}" href="{{ path('pdf_create_html') }}">Ajouter un pdf depuis du html</a> <br>
                 </div>
             </div>
         </div>
