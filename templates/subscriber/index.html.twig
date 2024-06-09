@@ -9,8 +9,8 @@
             <div class="card">
                 <h2>{{ subscription.title }}</h2>
                 <p>{{ subscription.description }}</p>
-                <p>{{ subscription.price }} €</p>
-                <p>{{ subscription.pdfLimit }} pdf par jour</p>
+                <p>{{ subscription.price }} € / mois</p>
+                <p>{{ subscription.pdfLimit }} pdfs par jour</p>
                 <a class="btn btn-primary {% if app.user.subscription.id == subscription.id %} disabled{% endif %}" href="{{ path('switch_subscription', {'id' : subscription.id}) }}">Souscrire</a>
             </div>
         {% endfor %}

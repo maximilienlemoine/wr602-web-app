@@ -6,6 +6,7 @@ use App\Form\PdfFileType;
 use App\Form\PdfHtmlType;
 use App\Form\PdfUrlType;
 use App\HttpClient\PdfServiceHttpClient;
+use App\Repository\PdfRepository;
 use App\Service\Mail\MailSender;
 use App\Service\Pdf\PdfLimiter;
 use App\Service\Pdf\PdfRegister;
@@ -42,10 +43,13 @@ class PdfController extends AbstractController
     }
 
     #[Route('/', name: 'pdf_index')]
-    public function index(): Response
+    public function index(PdfRepository $pdfRepository): Response
     {
+
+        $pdfCount = $pdfRepository->findCountTodayPdfByUser($this->getUser());
+
         return $this->render('pdf/index.html.twig', [
-            'controller_name' => 'PdfController',
+            'pdfCount' => $pdfCount,
         ]);
     }
 

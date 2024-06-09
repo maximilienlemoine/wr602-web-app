@@ -14,5 +14,21 @@
         <p>Connectez vous pour accéder à l'application.</p>
         <a class="btn btn-primary" href="{{ path('login') }}">Connexion</a>
     {% endif %}
+
+    <section>
+        <h2>
+            Les abonnements
+        </h2>
+        <div class="card-container">
+            {% for subscription in subscriptions %}
+                <div class="card">
+                    <h2>{{ subscription.title }}</h2>
+                    <p>{{ subscription.description }}</p>
+                    <p>{{ subscription.price }} €/mois</p>
+                    <p>{{ subscription.pdfLimit }} pdfs par jour</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
 </div>
 {% endblock %}
