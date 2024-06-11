@@ -9,9 +9,22 @@
 
     <h1>Inscription</h1>
 
-    {{ form_errors(registrationForm) }}
-
     {{ form_start(registrationForm) }}
+    {% if not registrationForm.vars.valid %}
+        <div class="alert alert-danger">
+            {{ form_errors(registrationForm) }}
+            {% for children in registrationForm.children %}
+                {% if not children.vars.valid %}
+                    {{ form_errors(children) }}
+                {% endif %}
+                {% for child in children %}
+                    {% if not child.vars.valid %}
+                        {{ form_errors(child) }}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
     <div class="mb-3">
         {{ form_label(registrationForm.email, 'Email *', {'label_attr': {'class': 'form-label'}}) }}
         {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control'}}) }}
