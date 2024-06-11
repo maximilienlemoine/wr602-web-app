@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Repository\SubscriptionRepository;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -21,10 +22,12 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 class RegistrationController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
+    private SubscriptionRepository $subscriptionRepository;
 
-    public function __construct(EmailVerifier $emailVerifier)
+    public function __construct(EmailVerifier $emailVerifier, SubscriptionRepository $subscriptionRepository)
     {
         $this->emailVerifier = $emailVerifier;
+        $this->subscriptionRepository = $subscriptionRepository;
     }
 
     /**
@@ -49,6 +52,7 @@ class RegistrationController extends AbstractController
                 )
             );
             $user->setRoles(['ROLE_USER']);
+            $user->setSubscription($this->subscriptionRepository->findOneBy(['title' => 'Gratuit']));
 
             $entityManager->persist($user);
             $entityManager->flush();

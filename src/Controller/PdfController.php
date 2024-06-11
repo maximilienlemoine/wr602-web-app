@@ -94,7 +94,7 @@ class PdfController extends AbstractController
 
             return new Response($response, 200, [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => sprintf('inline; filename="%s"', $pdfData['title'] . '.pdf'),
+                'Content-Disposition' => sprintf('attachement; filename="%s"', $pdfData['title'] . '.pdf'),
             ]);
         }
 
@@ -123,6 +123,10 @@ class PdfController extends AbstractController
             }
 
             $pdfData = $form->getData();
+
+            if (!is_dir($this->publicTempAbsoluteDirectory)) {
+                mkdir($this->publicTempAbsoluteDirectory, 0777, true);
+            }
 
             $filename = uniqid('pdf_', true) . '.html';
             $filePath = $this->publicTempAbsoluteDirectory . '/' . $filename;
@@ -207,7 +211,7 @@ class PdfController extends AbstractController
 
         return new Response($response, 200, [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => sprintf('inline; filename="%s"', $pdfData['title'] . '.pdf'),
+            'Content-Disposition' => sprintf('attachement; filename="%s"', $pdfData['title'] . '.pdf'),
         ]);
     }
 }
