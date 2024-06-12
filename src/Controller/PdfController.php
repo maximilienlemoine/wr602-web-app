@@ -35,7 +35,8 @@ class PdfController extends AbstractController
         PdfRegister          $pdfRegister,
         PdfLimiter           $pdfLimiter,
         MailSender           $mailSender,
-        string               $publicTempAbsoluteDirectory, PdfWatermarker $pdfWatermarker
+        string               $publicTempAbsoluteDirectory,
+        PdfWatermarker $pdfWatermarker
     ) {
         $this->pdfServiceHttpClient = $pdfServiceHttpClient;
         $this->pdfRegister = $pdfRegister;
