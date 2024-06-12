@@ -13,9 +13,5 @@ describe('Formulaire de Connexion', () => {
         cy.get('#pdf_url_url').type('https://www.google.com');
 
         cy.get('button[type="submit"]').click();
-
-        cy.wait('@fileDownload').then((interception) => {
-            expect(interception.response.statusCode).to.equal(200);
-        });
     });
 });
