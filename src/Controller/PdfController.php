@@ -10,6 +10,7 @@ use App\Repository\PdfRepository;
 use App\Service\Mail\MailSender;
 use App\Service\Pdf\PdfLimiter;
 use App\Service\Pdf\PdfRegister;
+use App\Service\Pdf\PdfWatermarker;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,19 +28,21 @@ class PdfController extends AbstractController
     private PdfLimiter $pdfLimiter;
     private MailSender $mailSender;
     private string $publicTempAbsoluteDirectory;
+    private PdfWatermarker $pdfWatermarker;
 
     public function __construct(
         PdfServiceHttpClient $pdfServiceHttpClient,
-        PdfRegister $pdfRegister,
-        PdfLimiter $pdfLimiter,
-        MailSender $mailSender,
-        string $publicTempAbsoluteDirectory
+        PdfRegister          $pdfRegister,
+        PdfLimiter           $pdfLimiter,
+        MailSender           $mailSender,
+        string               $publicTempAbsoluteDirectory, PdfWatermarker $pdfWatermarker
     ) {
         $this->pdfServiceHttpClient = $pdfServiceHttpClient;
         $this->pdfRegister = $pdfRegister;
         $this->pdfLimiter = $pdfLimiter;
         $this->mailSender = $mailSender;
         $this->publicTempAbsoluteDirectory = $publicTempAbsoluteDirectory;
+        $this->pdfWatermarker = $pdfWatermarker;
     }
 
     #[Route('/', name: 'pdf_index')]
@@ -82,6 +85,16 @@ class PdfController extends AbstractController
                     ],
                 ]
             );
+
+            if ($this->getUser()->getSubscription()->getTitle() === 'Gratuit') {
+                $pdfPath = $this->publicTempAbsoluteDirectory . '/' . $pdfData['title'] . '-watermarked.pdf';
+                file_put_contents($pdfPath, $response);
+
+                $this->pdfWatermarker->generateWatermark($pdfPath);
+                $response = file_get_contents($pdfPath);
+                unlink($pdfPath);
+            }
+
 
             $this->pdfRegister->registerPdf($this->getUser(), $pdfData);
             $this->mailSender->sendMail(
@@ -199,6 +212,15 @@ class PdfController extends AbstractController
             ]
         );
         unlink($filePath); // Supprimer le fichier après utilisation
+
+        if ($this->getUser()->getSubscription()->getTitle() === 'Gratuit') {
+            $pdfPath = $this->publicTempAbsoluteDirectory . '/' . $pdfData['title'] . '-watermarked.pdf';
+            file_put_contents($pdfPath, $response);
+
+            $this->pdfWatermarker->generateWatermark($pdfPath);
+            $response = file_get_contents($pdfPath);
+            unlink($pdfPath);
+        }
 
         $this->pdfRegister->registerPdf($this->getUser(), $pdfData);
         $this->mailSender->sendMail(
